@@ -15,6 +15,8 @@ class ProdutoAdmin(admin.ModelAdmin):
     '''
     Classe para administração de Model Produto
     '''
+    list_display = ['nome', 'get_descricao_encurtada',
+                    'get_preco_formatado', 'get_preco_promocional_formatado']
     inlines = [
         VariacaoInline
     ]

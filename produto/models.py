@@ -2,6 +2,7 @@
 from PIL import Image
 from django.db import models
 from django.conf import settings
+from utils.rands import slugify_new
 
 # Create your models here.
 
@@ -16,9 +17,12 @@ class Produto(models.Model):
     imagem = models.ImageField(
         upload_to='produto_imagens/%Y/%m/', blank=True, null=True
     )
-    slug = models.SlugField(unique=True)
-    preco_marketing = models.FloatField()
-    preco_marketing_promocional = models.FloatField(default=0.0)
+    slug = models.SlugField(unique=True, blank=True, null=True)
+    preco_marketing = models.FloatField(verbose_name='Preço')
+    preco_marketing_promocional = models.FloatField(
+        verbose_name='Preço Promocional',
+        default=0.0
+    )
     tipo = models.CharField(
         default='V',
         max_length=1,
@@ -27,6 +31,33 @@ class Produto(models.Model):
             ('S', 'Simples')
         )
     )
+
+    def get_preco_formatado(self):
+        '''
+        Formatação para mostrar o preço corretamente no Admin.
+        '''
+        return f'R$ {self.preco_marketing:.2f}'.replace('.', ',')
+    get_preco_formatado.short_description = 'Preço'  # type: ignore
+
+    def get_preco_promocional_formatado(self):
+        '''
+        Formatação para mostrar o preço promocional corretamente no Admin.
+        '''
+        return f'R$ {self.preco_marketing_promocional:.2f}'.replace('.', ',')
+
+    get_preco_promocional_formatado.short_description = (  # type: ignore
+        'Preço Promocional'
+    )
+
+    def get_descricao_encurtada(self):
+        '''
+        Formatação para encurtar a descrição em caso dela ser grande demais.
+        '''
+        if len(self.descricao_curta) < 30:
+            return self.descricao_curta
+
+        return self.descricao_curta[:30] + '...'  # pylint: disable=E1136
+    get_descricao_encurtada.short_description = 'Descrição'  # type: ignore
 
     @staticmethod
     def resize_image(img, new_width=800):
@@ -52,6 +83,9 @@ class Produto(models.Model):
         )
 
     def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify_new(self.nome)
+
         super().save(*args, **kwargs)
 
         max_image_size = 800
@@ -78,4 +112,7 @@ class Variacao(models.Model):
     estoque = models.PositiveIntegerField(default=1)
 
     def __str__(self) -> str:
-        return self.nome or self.produto.nome  # pylint: disable=E1101
+        if not self.nome:
+            return self.produto.nome
+
+        return f'{self.produto.nome} - {self.nome}'  # pylint: disable=E1101

@@ -62,10 +62,10 @@ class Perfil(models.Model):
     )
 
     def __str__(self) -> str:
-        # pylint: disable-next=E1101
-        if not self.usuario.first_name:
-            return self.usuario.username
+        if not self.usuario.first_name:  # pylint: disable=E1101
+            return self.usuario.username  # pylint: disable=E1101
 
+        # pylint: disable-next=E1101
         return f'{self.usuario.first_name} {self.usuario.last_name}'
 
     def clean(self):

@@ -1,4 +1,5 @@
-import re  # pylint: disable=C0114
+# pylint: disable=C0114
+import re
 
 
 def valida_cpf(cpf):
