@@ -1,9 +1,10 @@
-/djangoapp/static/
-/djangoapp/media/
-/djangoapp/project/local_settings.py
+/projeto_ecommerce/static/
+/projeto_ecommerce/media/
+/projeto_ecommerce/project/local_settings.py
 gunicorn-error-log
 __localcode
 /data/
+/media
 
 # Django #
 *.log

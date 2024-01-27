@@ -1,3 +1,6 @@
+# pylint: disable=fixme
+# flake8: noqa
+# type: ignore
 """
 Django settings for loja project.
 
@@ -9,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
+
 
 from pathlib import Path
 from django.contrib.messages import constants
@@ -39,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-
+    # Produtos
+    'produto',
 
 
     # TODO: Remover debug toolbar
