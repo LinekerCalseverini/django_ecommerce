@@ -45,6 +45,8 @@ INSTALLED_APPS = [
 
     # Produtos
     'produto',
+    # Pedidos
+    'pedido',
 
 
     # TODO: Remover debug toolbar
