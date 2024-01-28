@@ -2,7 +2,7 @@
 from django.urls import path
 from .views import (
     ListaProduto, DetalheProduto, AdicionarAoCarrinho, RemoverDoCarrinho,
-    Carrinho, Finalizar
+    Carrinho, ResumoDaCompra
 )
 
 app_name = 'produto'  # pylint: disable=C0103
@@ -15,5 +15,5 @@ urlpatterns = [
     path('removerdocarrinho/', RemoverDoCarrinho.as_view(),
          name='removerdocarrinho'),
     path('carrinho/', Carrinho.as_view(), name='carrinho'),
-    path('finalizar/', Finalizar.as_view(), name='finalizar'),
+    path('resumodacompra/', ResumoDaCompra.as_view(), name='resumodacompra'),
 ]

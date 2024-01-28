@@ -130,6 +130,6 @@ class Carrinho(View):
                       {'page_title': 'Carrinho - '})
 
 
-class Finalizar(View):
+class ResumoDaCompra(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('Finalizar')
+        return HttpResponse('ResumoDaCompra')
