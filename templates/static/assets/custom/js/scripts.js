@@ -16,9 +16,15 @@
         preco_promocional = this.options[this.selectedIndex].getAttribute('data-preco-promocional');
 
         variation_preco.innerHTML = preco;
+        variation_preco_promocional.innerHTML = ''
+        variation_preco.classList.replace('product-old-price', 'product-price')
+        variation_preco.classList.remove('text-muted')
 
-        if (variation_preco_promocional) {
+        if (preco_promocional) {
             variation_preco_promocional.innerHTML = preco_promocional;
+            variation_preco.classList.add('product-old-price')
+            variation_preco.classList.add('text-muted')
+            variation_preco.classList.remove('product-price')
         }
     })
 })();
