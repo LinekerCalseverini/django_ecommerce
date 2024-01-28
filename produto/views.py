@@ -1,6 +1,5 @@
 from typing import Any
-from django.db.models.query import QuerySet
-from django.shortcuts import redirect, reverse, get_object_or_404
+from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views import View
@@ -62,7 +61,8 @@ class AdicionarAoCarrinho(View):
         variacao = get_object_or_404(Variacao, id=variacao_id)
         carrinho = self.request.session.get('carrinho', {})
 
-        quantidade = carrinho.get(variacao_id, 0)
+        dados_variacao = carrinho.get(variacao_id, {'quantidade': 0})
+        quantidade = dados_variacao.get('quantidade')
         quantidade += 1
         if variacao.estoque < quantidade:
             messages.error(
@@ -70,8 +70,21 @@ class AdicionarAoCarrinho(View):
                 'Estoque insuficiente.'
             )
             return redirect(http_referer)
-        carrinho[variacao_id] = quantidade
+        dados_variacao.update({
+            'quantidade': quantidade,
+            'preco': variacao.preco,
+            'total': quantidade * variacao.preco,
+            'imagem': variacao.produto.imagem.url,
+            'nome': variacao.produto.nome,
+            'variacao': variacao.nome,
+            'slug': variacao.produto.slug
+        })
 
+        if variacao.preco_promocional:
+            dados_variacao['preco'] = variacao.preco_promocional
+            dados_variacao['total'] = quantidade * variacao.preco_promocional
+
+        carrinho[variacao_id] = dados_variacao
         self.request.session['carrinho'] = carrinho
         self.request.session.save()
 
@@ -85,18 +98,36 @@ class AdicionarAoCarrinho(View):
 
 class RemoverDoCarrinho(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('RemoverDoCarrinho')
+        http_referer = self.request.META.get(
+            'HTTP_REFERER',
+            reverse('produto:lista')
+        )
+        variacao_id = self.request.GET.get('vid')
+
+        if not variacao_id:
+            return redirect(http_referer)
+
+        carrinho = self.request.session.get('carrinho', {})
+        variacao_data = carrinho.get(variacao_id)
+
+        if not variacao_data:
+            return redirect(http_referer)
+
+        carrinho.pop(variacao_id, None)
+        self.request.session['carrinho'] = carrinho
+        self.request.session.save()
+        messages.success(
+            self.request,
+            f'Produto {variacao_data.get("nome")} removido do seu carrinho.'
+        )
+
+        return redirect(http_referer)
 
 
-class Carrinho(ListView):
-    template_name = 'produto/carrinho.html'
-    context_object_name = 'itens'
-
-    def get_queryset(self) -> QuerySet[Any]:
-        variacao_ids = self.request.session.get('carrinho', {}).keys()
-        query_set = Variacao.objects.filter(id__in=variacao_ids)
-
-        return query_set
+class Carrinho(View):
+    def get(self, *args, **kwargs):
+        return render(self.request, 'produto/carrinho.html',
+                      {'page_title': 'Carrinho - '})
 
 
 class Finalizar(View):

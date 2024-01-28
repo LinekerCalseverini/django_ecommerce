@@ -1,8 +1,71 @@
 {% extends "base.html" %}
+{% load omfilters %}
 {% block conteudo %}
-    {% for item in itens %}
-        {% for vid, qty in request.session.carrinho.items %}
-            {% if item.id|stringformat:"s" == vid %}{{ qty }}{% endif %}
-        {% endfor %}
-    {% endfor %}
+    {% if request.session.carrinho %}
+        <div class="row mt-3">
+            <div class="col">
+                <h3>Carrinho de compras</h3>
+                <p class="lead">Os produtos, quantidades e preços que você escolheu.</p>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="d-none d-lg-block">Imagem</th>
+                                <th>Produto</th>
+                                <th>V.</th>
+                                <th>Preço Unit.</th>
+                                <th>QTD.</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for id, item in request.session.carrinho.items %}
+                                <tr>
+                                    <td class="d-none d-lg-block">
+                                        <a href="{% url "produto:detalhe" item.slug %}?vid={{ id }}">
+                                            <img class="cart-img" src="{{ item.imagem }}">
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{% url "produto:detalhe" item.slug %}?vid={{ id }}">{{ item.nome }}</a>
+                                        <a class="ml-3"
+                                           href="{% url "produto:removerdocarrinho" %}?vid={{ id }}">
+                                            <i class="fas fa-times-circle text-danger" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                    <td>{{ item.variacao }}</td>
+                                    <td>{{ item.preco|formata_preco }}</td>
+                                    <td>{{ item.quantidade }}x</td>
+                                    <td>{{ item.total|formata_preco }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-lg">
+                <p class="lead">Total no carrinho</p>
+                <div class="table-responsive">
+                    <table class="table">
+                        <tr>
+                            <td class="font-weight-bold">Total</td>
+                            <td>{{ request.session.carrinho|total_carrinho|formata_preco }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="col-lg mt-auto">
+                <a class="btn btn-lg btn-block btn-primary" href="#">Finalizar a compra</a>
+            </div>
+        </div>
+    {% else %}
+        <div class="row mt-3">
+            <div class="col">
+                <h3>Carrinho de compras</h3>
+                <p class="lead">Seu carrinho está vazio.</p>
+            </div>
+        </div>
+    {% endif %}
 {% endblock conteudo %}
