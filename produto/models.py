@@ -3,6 +3,7 @@ from PIL import Image
 from django.db import models
 from django.conf import settings
 from utils.rands import slugify_new
+from utils.utils import formata_preco
 
 # Create your models here.
 
@@ -36,14 +37,14 @@ class Produto(models.Model):
         '''
         Formatação para mostrar o preço corretamente no Admin.
         '''
-        return f'R$ {self.preco_marketing:.2f}'.replace('.', ',')
+        return formata_preco(self.preco_marketing)
     get_preco_formatado.short_description = 'Preço'  # type: ignore
 
     def get_preco_promocional_formatado(self):
         '''
         Formatação para mostrar o preço promocional corretamente no Admin.
         '''
-        return f'R$ {self.preco_marketing_promocional:.2f}'.replace('.', ',')
+        return formata_preco(self.preco_marketing_promocional)
 
     get_preco_promocional_formatado.short_description = (  # type: ignore
         'Preço Promocional'

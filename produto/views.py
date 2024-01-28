@@ -2,13 +2,16 @@ from django.shortcuts import render
 from django.views.generic.list import ListView
 from django.views import View
 from django.http import HttpResponse
+from .models import Produto
 
 # Create your views here.
 
 
-class ListaProduto(View):
-    def get(self, *args, **kwargs):
-        return HttpResponse('ListaProduto')
+class ListaProduto(ListView):
+    model = Produto
+    template_name = 'produto/lista.html'
+    context_object_name = 'produtos'
+    paginate_by = 12
 
 
 class DetalheProduto(View):
