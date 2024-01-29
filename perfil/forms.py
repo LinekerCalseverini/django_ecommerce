@@ -4,6 +4,11 @@ from .models import Perfil
 
 
 class PerfilForm(forms.ModelForm):
+    complemento = forms.CharField(
+        required=False,
+        label='Complemento'
+    )
+
     class Meta:
         model = Perfil
         fields = '__all__'
@@ -38,7 +43,6 @@ class UserForm(forms.ModelForm):
         password_data = cleaned.get('password')
         password2_data = cleaned.get('password2')
 
-        print(cleaned)
         if password_data != password2_data:
             self.add_error(
                 'password',
@@ -94,7 +98,14 @@ class UserForm(forms.ModelForm):
         cleaned = self.cleaned_data
         password_data = cleaned.get('password')
 
-        if len(password_data) < 6:
+        if not self.usuario and not password_data:
+            self.add_error(
+                'password',
+                forms.ValidationError('Este campo é obrigatório.')
+            )
+            return password_data
+
+        if password_data and len(password_data) < 6:
             self.add_error(
                 'password',
                 forms.ValidationError('Senha deve ter no mínimo 6 caracteres.')
