@@ -2,18 +2,28 @@
 {% load crispy_forms_tags %}
 {% block conteudo %}
     <div class="row">
+        {% if not request.user.is_authenticated %}
+            <div class="col-lg">
+                <h1>Login</h1>
+            </div>
+        {% endif %}
         <div class="col-lg">
-            <h1>Login</h1>
-        </div>
-        <div class="col-lg">
-            <h1>Cadastro</h1>
+            <h1>
+                {% block tituloformulario %}
+                    Cadastro
+                {% endblock tituloformulario %}
+            </h1>
             <form action="{% url "perfil:criar" %}" method="post">
                 {% csrf_token %}
                 {{ userform|crispy }}
                 {{ perfilform|crispy }}
                 <div class="row">
                     <div class="col">
-                        <button type="submit" class="btn btn-primary btn-block btn-lg">Enviar</button>
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">
+                            {% block button_content %}
+                                Cadastrar
+                            {% endblock button_content %}
+                        </button>
                     </div>
                 </div>
             </form>

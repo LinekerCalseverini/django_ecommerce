@@ -4,6 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views import View
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 
 import copy
 
@@ -22,6 +23,7 @@ class BasePerfil(View):
 
         self.perfil = None
         if self.request.user.is_authenticated:
+            self.template_name = 'perfil/atualizar.html'
             self.perfil = (Perfil.objects.filter(usuario=self.request.user)
                            .first())
             self.contexto = {
@@ -53,46 +55,46 @@ class Criar(BasePerfil):
         if not userform.is_valid() or not perfilform.is_valid():
             return self.renderizar
 
-        username = userform.cleaned_data.get('username')
         password = userform.cleaned_data.get('password')
-        email = userform.cleaned_data.get('email')
-        first_name = userform.cleaned_data.get('first_name')
-        last_name = userform.cleaned_data.get('last_name')
 
         # Usuário logado
         if self.request.user.is_authenticated:
+            username = userform.cleaned_data.get('username')
+            email = userform.cleaned_data.get('email')
+            first_name = userform.cleaned_data.get('first_name')
+            last_name = userform.cleaned_data.get('last_name')
             usuario = get_object_or_404(User, pk=self.request.user.pk)
             usuario.username = username
             usuario.email = email
-
-            if password:
-                usuario.set_password(password)
-
-            if first_name:
-                usuario.first_name = first_name
-
-            if last_name:
-                usuario.last_name = last_name
-
-            usuario.save()
+            usuario.first_name = first_name
+            usuario.last_name = last_name
 
         # Usuário não logado (novo)
         else:
             usuario = userform.save(commit=False)
-            usuario.set_password(password)
-            usuario.save()
 
-            perfil = perfilform.save(commit=False)
-            perfil.usuario = usuario
-            perfil.save()
+        if password:
+            usuario.set_password(password)
+
+        usuario.save()
+
+        perfil = perfilform.save(commit=False)
+        perfil.usuario = usuario
+        perfil.save()
+
+        if password:
+            autentica = authenticate(
+                self.request,
+                username=usuario,
+                password=password
+            )
+
+            if autentica:
+                login(self.request, user=usuario)
 
         self.request.session['carrinho'] = self.carrinho
         self.request.session.save()
         return self.renderizar
-
-
-class Atualizar(BasePerfil):
-    pass
 
 
 class Login(View):
