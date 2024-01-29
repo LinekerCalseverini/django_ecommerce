@@ -3,16 +3,36 @@
 {% block conteudo %}
     <div class="row">
         {% if not request.user.is_authenticated %}
-            <div class="col-lg">
-                <h1>Login</h1>
+            <div class="col-lg mt-3">
+                <h4>Login</h4>
+                <p>Se você já se cadastrou, basta logar com seu usuário e senha abaixo.</p>
+                <form method="post" action="{% url "perfil:login" %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="login_username">Usuário:</label>
+                        <input name="username"
+                               type="text"
+                               class="form-control"
+                               id="login_username"
+                               placeholder="Digite seu usuário...">
+                    </div>
+                    <div class="form-group">
+                        <label for="login_password">Senha:</label>
+                        <input name="password"
+                               type="password"
+                               class="form-control"
+                               id="login_password"
+                               placeholder="Digite sua senha...">
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Entrar</button>
+                </form>
             </div>
         {% endif %}
-        <div class="col-lg">
-            <h1>
-                {% block tituloformulario %}
-                    Cadastro
-                {% endblock tituloformulario %}
-            </h1>
+        <div class="col-lg mt-3">
+            {% block tituloformulario %}
+                <h4>Cadastro</h4>
+                <p>Cadastre-se agora e compre com os melhores preços!</p>
+            {% endblock tituloformulario %}
             <form action="{% url "perfil:criar" %}" method="post">
                 {% csrf_token %}
                 {{ userform|crispy }}

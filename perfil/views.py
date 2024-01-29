@@ -1,10 +1,11 @@
 from typing import Any
 from django.http.request import HttpRequest
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 from django.http import HttpResponse
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 
 import copy
 
@@ -94,14 +95,51 @@ class Criar(BasePerfil):
 
         self.request.session['carrinho'] = self.carrinho
         self.request.session.save()
-        return self.renderizar
+
+        messages.success(
+            self.request,
+            'Dados atualizados.'
+        )
+        return redirect('perfil:criar')
 
 
 class Login(View):
-    def get(self, *args, **kwargs):
-        return HttpResponse('Login')
+    def post(self, *args, **kwargs):
+        username = self.request.POST.get('username')
+        password = self.request.POST.get('password')
+
+        if not username or not password:
+            messages.error(
+                self.request,
+                'Usuário ou senha não preenchidos.'
+            )
+            return redirect('perfil:criar')
+
+        usuario = authenticate(
+            self.request,
+            username=username,
+            password=password
+        )
+
+        if not usuario:
+            messages.error(
+                self.request,
+                'Usuário ou senha inválidos.'
+            )
+            return redirect('perfil:criar')
+
+        login(self.request, user=usuario)
+        messages.success(
+            self.request,
+            'Conectado com sucesso.'
+        )
+        return redirect('produto:carrinho')
 
 
 class Logout(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('Logout')
+        carrinho = copy.deepcopy(self.request.session.get('carrinho', {}))
+        logout(self.request)
+        self.request.session['carrinho'] = carrinho
+        self.request.session.save()
+        return redirect('produto:lista')
