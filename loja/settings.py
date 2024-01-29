@@ -43,6 +43,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Formulários formatados
+    'crispy_forms',
+    'crispy_bootstrap4',
+
     # Produtos
     'produto',
     # Pedidos
@@ -54,6 +58,10 @@ INSTALLED_APPS = [
     # TODO: Remover debug toolbar
     'debug_toolbar',
 ]
+
+# Configuração do Crispy
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
