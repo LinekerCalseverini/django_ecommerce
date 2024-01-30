@@ -6,6 +6,7 @@ from django.views.generic.detail import DetailView
 from django.views import View
 from django.contrib import messages
 from .models import Produto, Variacao
+from perfil.models import Perfil
 
 # Create your views here.
 
@@ -132,4 +133,21 @@ class Carrinho(View):
 
 class ResumoDaCompra(View):
     def get(self, *args, **kwargs):
+        usuario = self.request.user
+
+        if not usuario.is_authenticated:
+            return redirect('produto:lista')
+
+        perfil = Perfil.objects.filter(usuario=usuario).first()
+
+        if not self.request.session.get('carrinho'):
+            messages.error(
+                self.request,
+                'Carrinho vazio.'
+            )
+            return redirect('produto:lista')
+
+        if not perfil:
+            return redirect('perfil:criar')
+
         return render(self.request, 'produto/resumodacompra.html')
