@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load omfilters %}
+{% block conteudo %}
+    <div class="row mb-5">
+        <div class="col-lg">
+            <h2>Resumo da sua compra</h2>
+            <p class="lead">Dados do usuário</p>
+            <p>
+                Caso precise editar, <a href="{% url "perfil:criar" %}">clique aqui</a>
+            </p>
+            <dl class="row">
+                <dt class="col-lg-2">Nome:</dt>
+                <dd class="col-lg-4">
+                    {{ request.user.first_name }}
+                </dd>
+                <dt class="col-lg-2">Sobrenome:</dt>
+                <dd class="col-lg-4">
+                    {{ request.user.last_name }}
+                </dd>
+                <dt class="col-lg-2">Idade:</dt>
+                <dd class="col-lg-4">
+                    {{ request.user.perfil.idade }}
+                </dd>
+                <dt class="col-lg-2">Nascimento:</dt>
+                <dd class="col-lg-4">
+                    {{ request.user.perfil.data_nascimento }}
+                </dd>
+                <dt class="col-lg-2">CPF:</dt>
+                <dd class="col-lg-4">
+                    {{ request.user.perfil.cpf }}
+                </dd>
+                <dt class="col-lg-2">E-mail:</dt>
+                <dd class="col-lg-4">
+                    {{ request.user.email }}
+                </dd>
+            </dl>
+            <p class="lead">Dados de endereço</p>
+            <p>
+                Caso precise editar, <a href="{% url "perfil:criar" %}">clique aqui</a>
+            </p>
+            <dl class="row">
+                <dt class="col-lg-2">Endereço:</dt>
+                <dd class="col-lg-4">
+                    {{ request.user.perfil.endereco }}
+                </dd>
+                <dt class="col-lg-2">Número:</dt>
+                <dd class="col-lg-4">
+                    {{ request.user.perfil.numero }}
+                </dd>
+                <dt class="col-lg-2">Complemento:</dt>
+                <dd class="col-lg-4">
+                    {{ request.user.perfil.complemento }}
+                </dd>
+                <dt class="col-lg-2">Bairro:</dt>
+                <dd class="col-lg-4">
+                    {{ request.user.perfil.bairro }}
+                </dd>
+                <dt class="col-lg-2">Cidade:</dt>
+                <dd class="col-lg-4">
+                    {{ request.user.perfil.cidade }}
+                </dd>
+                <dt class="col-lg-2">Estado:</dt>
+                <dd class="col-lg-4">
+                    {{ request.user.perfil.estado }}
+                </dd>
+                <dt class="col-lg-2">CEP:</dt>
+                <dd class="col-lg-4">
+                    {{ request.user.perfil.cep }}
+                </dd>
+            </dl>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h3>Carrinho de compras</h3>
+            <p class="lead">Os produtos, quantidades e preços que você escolheu.</p>
+            {% include "parciais/_carrinho.html" %}
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-lg">
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <td class="font-weight-bold">Total</td>
+                        <td>{{ request.session.carrinho|total_carrinho|formata_preco }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="col-lg mt-auto">
+            <a class="btn btn-lg btn-block btn-primary" href="{% url "pedido:pagar" %}">Confirmar</a>
+        </div>
+    </div>
+{% endblock conteudo %}

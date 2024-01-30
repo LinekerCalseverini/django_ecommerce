@@ -2,7 +2,6 @@ from typing import Any
 from django.http.request import HttpRequest
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
-from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -54,6 +53,10 @@ class Criar(BasePerfil):
         perfilform = self.contexto['perfilform']
 
         if not userform.is_valid() or not perfilform.is_valid():
+            messages.error(
+                self.request,
+                'Alguns campos estão com erro. Revise seus dados.'
+            )
             return self.renderizar
 
         password = userform.cleaned_data.get('password')
@@ -100,7 +103,8 @@ class Criar(BasePerfil):
             self.request,
             'Dados atualizados.'
         )
-        return redirect('perfil:criar')
+
+        return redirect('produto:carrinho')
 
 
 class Login(View):

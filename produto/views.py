@@ -1,9 +1,9 @@
 from typing import Any
-from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views import View
-from django.http import HttpResponse
 from django.contrib import messages
 from .models import Produto, Variacao
 
@@ -132,4 +132,4 @@ class Carrinho(View):
 
 class ResumoDaCompra(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('ResumoDaCompra')
+        return render(self.request, 'produto/resumodacompra.html')
