@@ -12,7 +12,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for id, item in request.session.carrinho.items %}
+            {% for id, item in carrinho.items %}
                 <tr>
                     <td class="d-none d-lg-block">
                         <a href="{% url "produto:detalhe" item.slug %}?vid={{ id }}">

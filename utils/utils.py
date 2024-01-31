@@ -10,6 +10,6 @@ def total_carrinho(carrinho):
 
 
 def qtd_carrinho(carrinho):
-    total = sum([item['quantidade'] for item in carrinho.values()])
+    total = sum(list(carrinho.values()))
 
     return total

@@ -11,7 +11,7 @@
     font-size: 1rem;
 }
 
-.border-top-light-custom{
+.border-top-light-custom {
     border-top: 1px solid rgba(0, 0, 0, 0.125);
 }
 
@@ -31,7 +31,7 @@
     }
 }
 
-ul.errorlist  {
+ul.errorlist {
     list-style-type: none;
     margin: 5px 0;
     padding: 0;
@@ -74,10 +74,13 @@ ul.errorlist li {
 .form-group textarea {
     width: 100%;
 }
-.nav-cart, .nav-cart a {
+
+.nav-cart,
+.nav-cart a {
     color: #fff;
     text-decoration: none;
 }
+
 .cart-img {
     max-width: 150px;
 }

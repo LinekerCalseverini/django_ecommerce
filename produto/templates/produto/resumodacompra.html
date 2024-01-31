@@ -83,13 +83,14 @@
                 <table class="table">
                     <tr>
                         <td class="font-weight-bold">Total</td>
-                        <td>{{ request.session.carrinho|total_carrinho|formata_preco }}</td>
+                        <td>{{ carrinho|total_carrinho|formata_preco }}</td>
                     </tr>
                 </table>
             </div>
         </div>
         <div class="col-lg mt-auto">
-            <a class="btn btn-lg btn-block btn-primary" href="{% url "pedido:pagar" %}">Confirmar</a>
+            <a class="btn btn-lg btn-block btn-primary"
+               href="{% url "pedido:pagar" %}">Confirmar</a>
         </div>
     </div>
 {% endblock conteudo %}
