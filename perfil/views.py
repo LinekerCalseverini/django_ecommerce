@@ -31,12 +31,14 @@ class BasePerfil(View):
                                      usuario=self.request.user,
                                      instance=self.request.user),
                 'perfilform': PerfilForm(data=self.request.POST or None,
-                                         instance=self.perfil)
+                                         instance=self.perfil),
+                'page_title': 'Atualizar Dados - '
             }
         else:
             self.contexto = {
                 'userform': UserForm(data=self.request.POST or None),
-                'perfilform': PerfilForm(data=self.request.POST or None)
+                'perfilform': PerfilForm(data=self.request.POST or None),
+                'page_title': 'Conectar - '
             }
 
         self.renderizar = render(

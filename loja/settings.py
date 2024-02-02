@@ -53,10 +53,6 @@ INSTALLED_APPS = [
     'pedido',
     # Perfis
     'perfil',
-
-
-    # TODO: Remover debug toolbar
-    'debug_toolbar',
 ]
 
 # Configuração do Crispy
@@ -71,11 +67,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-
-
-    # TODO: remover debug toolbar
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'loja.urls'
@@ -171,11 +162,6 @@ SESSION_SAVE_EVERY_REQUEST = False
 # Serializer - parão JSON
 # SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickeSerializer'
 
-
-# TODO: Remover debug toolbar
-INTERNAL_IPS = [
-    '127.0.0.1'
-]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

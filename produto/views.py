@@ -157,7 +157,7 @@ class ResumoDaCompra(View):
             self.request,
             'produto/resumodacompra.html',
             {
-                'page_title': 'Carrinho - ',
+                'page_title': 'Resumo da Compra - ',
                 'carrinho': itens
             }
         )

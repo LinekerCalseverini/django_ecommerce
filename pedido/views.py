@@ -32,6 +32,13 @@ class Pagar(DispatchLoginRequiredMixin, DetailView):
     pk_url_kwarg = 'pk'
     context_object_name = 'pedido'
 
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        ctx = super().get_context_data(**kwargs)
+        ctx.update({
+            'page_title': f'{self.get_object()} - Pagar - '
+        })
+        return ctx
+
 
 class SalvarPedido(View):
     template_name = 'pedido/pagar.html'
@@ -140,6 +147,13 @@ class Detalhe(DispatchLoginRequiredMixin, DetailView):
             )
         return super().get(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        ctx = super().get_context_data(**kwargs)
+        ctx.update({
+            'page_title': f'{self.get_object()} - Detalhe - '
+        })
+        return ctx
+
 
 class ListaPedido(DispatchLoginRequiredMixin, ListView):
     model = Pedido
@@ -152,6 +166,7 @@ class ListaPedido(DispatchLoginRequiredMixin, ListView):
         ctx = super().get_context_data(**kwargs)
         usuario = Perfil.objects.filter(usuario=self.request.user).first()
         ctx.update({
-            'usuario': usuario
+            'usuario': usuario,
+            'page_title': f'Pedidos de {usuario} - '
         })
         return ctx
