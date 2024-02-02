@@ -17,6 +17,7 @@ class ListaProduto(ListView):
     template_name = 'produto/lista.html'
     context_object_name = 'produtos'
     paginate_by = 12
+    ordering = ['-id']
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         ctx = super().get_context_data(**kwargs)

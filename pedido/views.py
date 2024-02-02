@@ -2,8 +2,8 @@ from typing import Any
 from django.db.models.query import QuerySet
 from django.shortcuts import reverse, redirect
 from django.views import View
-from django.views.generic import DetailView
-from django.http import HttpResponse
+from django.views.generic import DetailView, ListView
+from django.http import HttpRequest, HttpResponse
 from django.contrib import messages
 
 from perfil.models import Perfil
@@ -15,22 +15,22 @@ from .models import Pedido, ItemPedido
 # Create your views here.
 
 
-class DispatchLoginRequired(View):
+class DispatchLoginRequiredMixin(View):
     def dispatch(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return redirect('perfil:criar')
 
         return super().dispatch(*args, **kwargs)
 
+    def get_queryset(self) -> QuerySet[Any]:
+        return super().get_queryset().filter(usuario=self.request.user)
 
-class Pagar(DispatchLoginRequired, DetailView):
+
+class Pagar(DispatchLoginRequiredMixin, DetailView):
     template_name = 'pedido/pagar.html'
     model = Pedido
     pk_url_kwarg = 'pk'
     context_object_name = 'pedido'
-
-    def get_queryset(self) -> QuerySet[Any]:
-        return super().get_queryset().filter(usuario=self.request.user)
 
 
 class SalvarPedido(View):
@@ -59,7 +59,6 @@ class SalvarPedido(View):
         for variacao in bd_variacoes:
             vid = str(variacao.pk)
             estoque = variacao.estoque
-            print(estoque)
             qtd_carrinho = carrinho.get(vid, 0)
 
             if qtd_carrinho > estoque:
@@ -69,6 +68,10 @@ class SalvarPedido(View):
             carrinho[vid] = qtd_carrinho
             if qtd_carrinho == 0:
                 carrinho.pop(vid, None)
+
+            estoque -= qtd_carrinho
+            variacao.estoque = estoque
+            variacao.save()
 
         self.request.session['carrinho'] = carrinho
         self.request.session.save()
@@ -106,6 +109,8 @@ class SalvarPedido(View):
         )
 
         self.request.session.pop('carrinho', None)
+        self.request.session.save()
+
         return redirect(
             reverse(
                 'pedido:pagar',
@@ -116,11 +121,37 @@ class SalvarPedido(View):
         )
 
 
-class Detalhe(View):
-    def get(self, *args, **kwargs):
-        return HttpResponse('Detalhe')
+class Detalhe(DispatchLoginRequiredMixin, DetailView):
+    template_name = 'pedido/detalhe.html'
+    model = Pedido
+    pk_url_kwarg = 'pk'
+    context_object_name = 'pedido'
+
+    def get(self, request, *args, **kwargs):
+        pedido = self.get_object()
+        if pedido.status in 'CRP':
+            return redirect(
+                reverse(
+                    'pedido:pagar',
+                    kwargs={
+                        'pk': pedido.pk
+                    }
+                )
+            )
+        return super().get(request, *args, **kwargs)
 
 
-class ListaPedido(View):
-    def get(self, *args, **kwargs):
-        return HttpResponse('ListaPedido')
+class ListaPedido(DispatchLoginRequiredMixin, ListView):
+    model = Pedido
+    context_object_name = 'pedidos'
+    template_name = 'pedido/lista.html'
+    paginate_by = 10
+    ordering = ['-id']
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        ctx = super().get_context_data(**kwargs)
+        usuario = Perfil.objects.filter(usuario=self.request.user).first()
+        ctx.update({
+            'usuario': usuario
+        })
+        return ctx

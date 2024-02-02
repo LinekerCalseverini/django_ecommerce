@@ -1,0 +1,57 @@
+{% load omfilters %}
+<div class="row">
+    <div class="col">
+        <h3>{{ pedido }}</h3>
+        <div class="row mt-4">
+            <div class="col-lg-2 font-weight-bold">Número do pedido:</div>
+            <div class="col-lg-4">{{ pedido.pk }}</div>
+            <div class="col-lg-2 font-weight-bold">Total a pagar:</div>
+            <div class="col-lg-4">{{ pedido.total|formata_preco }}</div>
+            <div class="col-lg-2 font-weight-bold">QTD. Itens:</div>
+            <div class="col-lg-4">1{{ pedido.qtd_total }}</div>
+            <div class="col-lg-2 font-weight-bold">Status:</div>
+            <div class="col-lg-4">{{ pedido.get_status_display }}</div>
+        </div>
+        <div class="row mt-4">
+            <div class="col">
+                <h3>Produtos</h3>
+            </div>
+        </div>
+        <div class="table-responsive mt-3">
+            <table class="table">
+                <tbody>
+                    <thead>
+                        <tr>
+                            <th class="d-none d-lg-block">Imagem</th>
+                            <th>Produto</th>
+                            <th>V.</th>
+                            <th>Preço</th>
+                            <th>QTD.</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        {% for item in pedido.itempedido_set.all %}
+                            <tr>
+                                <td class="d-none d-lg-block">
+                                    <a href="{% url "produto:detalhe" item.variacao.produto.slug %}?vid={{ item.variacao.pk }}">
+                                        <img class="cart-img" src="{{ item.variacao.produto.imagem.url }}">
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{% url "produto:detalhe" item.variacao.produto.slug %}?vid={{ item.variacao.pk }}">
+                                        {{ item.variacao.produto.nome }}
+                                    </a>
+                                </td>
+                                <td>{{ item.variacao.nome }}</td>
+                                <td>{{ item.preco|formata_preco }}</td>
+                                <td>{{ item.quantidade }}</td>
+                                <td>{{ item.preco|multiply:item.quantidade|formata_preco }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tfoot>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
