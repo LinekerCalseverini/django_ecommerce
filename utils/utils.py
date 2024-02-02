@@ -13,3 +13,7 @@ def qtd_carrinho(carrinho):
     total = sum(list(carrinho.values()))
 
     return total
+
+
+def multiply(value, multiplier):
+    return value * multiplier

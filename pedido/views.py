@@ -1,5 +1,8 @@
-from django.shortcuts import render, redirect
+from typing import Any
+from django.db.models.query import QuerySet
+from django.shortcuts import reverse, redirect
 from django.views import View
+from django.views.generic import DetailView
 from django.http import HttpResponse
 from django.contrib import messages
 
@@ -12,7 +15,25 @@ from .models import Pedido, ItemPedido
 # Create your views here.
 
 
-class Pagar(View):
+class DispatchLoginRequired(View):
+    def dispatch(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('perfil:criar')
+
+        return super().dispatch(*args, **kwargs)
+
+
+class Pagar(DispatchLoginRequired, DetailView):
+    template_name = 'pedido/pagar.html'
+    model = Pedido
+    pk_url_kwarg = 'pk'
+    context_object_name = 'pedido'
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return super().get_queryset().filter(usuario=self.request.user)
+
+
+class SalvarPedido(View):
     template_name = 'pedido/pagar.html'
 
     def get(self, *args, **kwargs):
@@ -85,12 +106,14 @@ class Pagar(View):
         )
 
         self.request.session.pop('carrinho', None)
-        return redirect('pedido:lista')
-
-
-class SalvarPedido(View):
-    def get(self, *args, **kwargs):
-        return HttpResponse('FecharPedido')
+        return redirect(
+            reverse(
+                'pedido:pagar',
+                kwargs={
+                    'pk': pedido.pk
+                }
+            )
+        )
 
 
 class Detalhe(View):
