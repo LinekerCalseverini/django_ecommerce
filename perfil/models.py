@@ -71,8 +71,14 @@ class Perfil(models.Model):
     def clean(self):
         error_messages = {}
 
+        cpf_enviado = self.cpf or None
+        perfil = Perfil.objects.filter(cpf=cpf_enviado).first()
+
         if not valida_cpf(self.cpf):
             error_messages['cpf'] = 'CPF Inválido'
+
+        if perfil and (perfil.pk != self.pk or not self.pk):
+            error_messages['cpf'] = 'CPF já está sendo utilizado'
 
         # pylint: disable-next=E1101
         if not self.cep.isnumeric() or len(self.cep) != 8:
