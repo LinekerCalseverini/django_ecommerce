@@ -1,7 +1,7 @@
 # pylint: disable=C0114
 from django.db import models
 from django.contrib.auth.models import User
-from produto.models import Produto, Variacao
+from produto.models import Variacao
 
 # Create your models here.
 

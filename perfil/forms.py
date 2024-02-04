@@ -1,21 +1,34 @@
+'''
+Módulo para definir os forms que serão utilizados
+'''
+#  pylint: disable=W0613
 from django import forms
 from django.contrib.auth.models import User
 from .models import Perfil
 
 
 class PerfilForm(forms.ModelForm):
+    '''
+    Formulário de cadastro do Perfil
+    '''
     complemento = forms.CharField(
         required=False,
         label='Complemento'
     )
 
     class Meta:
+        '''
+        Configuração Meta desta classe.
+        '''
         model = Perfil
         fields = '__all__'
         exclude = ('usuario',)
 
 
 class UserForm(forms.ModelForm):
+    '''
+    Formulário de cadastro do Usuário.
+    '''
     password = forms.CharField(
         required=False,
         widget=forms.PasswordInput(),
@@ -29,11 +42,14 @@ class UserForm(forms.ModelForm):
     )
 
     class Meta:
+        '''
+        Meta configuração da classe.
+        '''
         model = User
         fields = ('first_name', 'last_name', 'username',
                   'password', 'password2', 'email')
 
-    def __init__(self, usuario=None, *args, **kwargs):
+    def __init__(self, *args, usuario=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.usuario = usuario
 
@@ -54,6 +70,9 @@ class UserForm(forms.ModelForm):
             )
 
     def clean_username(self, *args, **kwargs):
+        '''
+        Função de limpeza do campo de username para tratar erros.
+        '''
         cleaned = self.cleaned_data
         usuario_data = cleaned.get('username')
         usuario_db = User.objects.filter(username=usuario_data).first()
@@ -75,6 +94,9 @@ class UserForm(forms.ModelForm):
         return usuario_data
 
     def clean_email(self, *args, **kwargs):
+        '''
+        Função de limpeza do campo de email para tratar erros.
+        '''
         cleaned = self.cleaned_data
         email_data = cleaned.get('email')
         email_db = User.objects.filter(email=email_data).first()
@@ -95,6 +117,9 @@ class UserForm(forms.ModelForm):
         return email_data
 
     def clean_password(self, *args, **kwargs):
+        '''
+        Função de limpeza do campo de password para tratar erros.
+        '''
         cleaned = self.cleaned_data
         password_data = cleaned.get('password')
 

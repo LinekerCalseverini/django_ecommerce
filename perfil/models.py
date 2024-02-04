@@ -1,4 +1,7 @@
-# pylint: disable=C0114
+# pylint: disable=E1101
+'''
+Módulo dos models do app Perfil
+'''
 from django.db import models
 from django.contrib.auth.models import User
 from django.forms import ValidationError

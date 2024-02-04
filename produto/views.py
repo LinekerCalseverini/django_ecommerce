@@ -1,25 +1,31 @@
+'''
+Módulo que controla as views do app produto.
+'''
+# pylint: disable=E1101,W0613
 from typing import Any
 from django.db.models.query import QuerySet
-from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views import View
 from django.contrib import messages
+from django.db.models import Q
+from perfil.models import Perfil
 from .models import Produto, Variacao
 from .utils import formata_carrinho
-from perfil.models import Perfil
-from django.db.models import Q
 
 # Create your views here.
 
 
 class ListaProduto(ListView):
+    '''
+    View que controla como a lista de produtos será renderizada.
+    '''
     model = Produto
     template_name = 'produto/lista.html'
     context_object_name = 'produtos'
-    paginate_by = 1
+    paginate_by = 12
     ordering = ['-id']
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
@@ -33,6 +39,10 @@ class ListaProduto(ListView):
 
 
 class Busca(ListaProduto):
+    '''
+    View que define como renderizar quando existem termos no campo de busca.
+    '''
+
     def get(self, request, *args, **kwargs):
         termo = self.request.GET.get('termo', '').strip()
         if not termo:
@@ -63,6 +73,9 @@ class Busca(ListaProduto):
 
 
 class DetalheProduto(DetailView):
+    '''
+    View que define como a página de detalhes de um produto será renderizada.
+    '''
     model = Produto
     template_name = 'produto/detalhe.html'
     context_object_name = 'produto'
@@ -73,14 +86,22 @@ class DetalheProduto(DetailView):
         produto = self.get_object()
 
         ctx.update({
-            'page_title': f'Comprar {produto.nome} - '
+            'page_title': f'Comprar {produto.nome} - '  # type: ignore
         })
 
         return ctx
 
 
 class AdicionarAoCarrinho(View):
+    '''
+    View que define a função de adicionar um produto ao Carrinho. Redireciona
+    para a página de carrinho.
+    '''
+
     def get(self, *args, **kwargs):
+        '''
+        Função que define como esta view responderá a requests do tipo GET.
+        '''
         http_referer = self.request.META.get(
             'HTTP_REFERER',
             reverse('produto:lista')
@@ -119,7 +140,15 @@ class AdicionarAoCarrinho(View):
 
 
 class RemoverDoCarrinho(View):
+    '''
+    View que define como a função de remoção do carrinho vai funcionar.
+    '''
+
     def get(self, *args, **kwargs):
+        '''
+        View que define como a remoção do carrinho vai responder a requisições
+        GET.
+        '''
         http_referer = self.request.META.get(
             'HTTP_REFERER',
             reverse('produto:lista')
@@ -139,8 +168,9 @@ class RemoverDoCarrinho(View):
         self.request.session['carrinho'] = carrinho
         self.request.session.save()
         variacao = Variacao.objects.filter(variacao_pk=variacao_id)
-        variacao_nome = variacao.produto.nome
-        variacao_nome += f'- {variacao.nome}' if variacao_nome else ''
+        variacao_nome = variacao.produto.nome   # type: ignore
+        variacao_nome += (f'- {variacao.nome}'  # type: ignore
+                          if variacao_nome else '')
         messages.success(
             self.request,
             f'Produto {variacao_nome} removido do seu carrinho.'
@@ -150,6 +180,10 @@ class RemoverDoCarrinho(View):
 
 
 class Carrinho(ListView):
+    '''
+    View que define como a página de carrinho será renderizada.
+    '''
+
     def get(self, *args, **kwargs):
         carrinho = self.request.session.get('carrinho', {})
         itens = formata_carrinho(carrinho)
@@ -165,7 +199,15 @@ class Carrinho(ListView):
 
 
 class ResumoDaCompra(View):
+    '''
+    View que define como a página de resumo da compra (antes da página de
+    pagamento) será renderizada.
+    '''
+
     def get(self, *args, **kwargs):
+        '''
+        Função que define como a view responderá a requisições http GET.
+        '''
         usuario = self.request.user
 
         if not usuario.is_authenticated:

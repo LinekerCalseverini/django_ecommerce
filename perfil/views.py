@@ -1,4 +1,9 @@
+'''
+Módulo para definição das views do app Perfil.
+'''
+# pylint: disable=E1101,W0201, W0613
 from typing import Any
+import copy
 from django.http.request import HttpRequest
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
@@ -6,7 +11,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
-import copy
 
 from .models import Perfil
 from .forms import UserForm, PerfilForm
@@ -15,6 +19,10 @@ from .forms import UserForm, PerfilForm
 
 
 class BasePerfil(View):
+    '''
+    View para definir como renderizar o formulário de atualização de dados ou
+    criação do perfil.
+    '''
     template_name = 'perfil/criar.html'
 
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
@@ -46,11 +54,21 @@ class BasePerfil(View):
         )
 
     def get(self, *args, **kwargs):
+        '''
+        Método que define como a View responderá a requisições de GET.
+        '''
         return self.renderizar
 
 
 class Criar(BasePerfil):
+    '''
+    Função de Definição de como o formulário de cadastro será renderizado.
+    '''
+
     def post(self, *args, **kwargs):
+        '''
+        Método que define como a View responderá a requisições de POST.
+        '''
         userform = self.contexto['userform']
         perfilform = self.contexto['perfilform']
 
@@ -110,7 +128,15 @@ class Criar(BasePerfil):
 
 
 class Login(View):
+    '''
+    View que define como o login será autenticado.
+    '''
+
     def post(self, *args, **kwargs):
+        '''
+        Como essa função exige que o usuário mande dados para que possa se
+        logar, esta classe só aceita requisições POST.
+        '''
         username = self.request.POST.get('username')
         password = self.request.POST.get('password')
 
@@ -143,7 +169,15 @@ class Login(View):
 
 
 class Logout(View):
+    '''
+    View que define como o usuário se deslogará do sistema.
+    '''
+
     def get(self, *args, **kwargs):
+        '''
+        Essa view pode usar requisições GET, já que só exige uma sessão
+        autenticada.
+        '''
         carrinho = copy.deepcopy(self.request.session.get('carrinho', {}))
         logout(self.request)
         self.request.session['carrinho'] = carrinho

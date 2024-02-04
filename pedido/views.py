@@ -1,9 +1,12 @@
+'''
+Views do App Pedido
+'''
 from typing import Any
 from django.db.models.query import QuerySet
-from django.shortcuts import reverse, redirect
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.views import View
 from django.views.generic import DetailView, ListView
-from django.http import HttpRequest, HttpResponse
 from django.contrib import messages
 
 from perfil.models import Perfil
@@ -16,6 +19,10 @@ from .models import Pedido, ItemPedido
 
 
 class DispatchLoginRequiredMixin(View):
+    '''
+    Classe para limitar View apenas para usuários logados
+    '''
+
     def dispatch(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return redirect('perfil:criar')
@@ -23,10 +30,18 @@ class DispatchLoginRequiredMixin(View):
         return super().dispatch(*args, **kwargs)
 
     def get_queryset(self) -> QuerySet[Any]:
-        return super().get_queryset().filter(usuario=self.request.user)
+        '''
+        Definição de queryset para limitar apenas para usuários logados
+        '''
+        return super().get_queryset().filter(  # type: ignore
+            usuario=self.request.user
+        )
 
 
 class Pagar(DispatchLoginRequiredMixin, DetailView):
+    '''
+    View que renderiza a página de pagamento
+    '''
     template_name = 'pedido/pagar.html'
     model = Pedido
     pk_url_kwarg = 'pk'
@@ -41,13 +56,19 @@ class Pagar(DispatchLoginRequiredMixin, DetailView):
 
 
 class SalvarPedido(View):
+    '''
+    View que executa a função de salvar o pedido no banco
+    '''
     template_name = 'pedido/pagar.html'
 
-    def get(self, *args, **kwargs):
+    def get(self, *args, **kwargs):  # pylint: disable=W0613
+        '''
+        Função que define como a view vai responder ao método http GET.
+        '''
         usuario = self.request.user
         if not usuario.is_authenticated:
             return redirect('produto:lista')
-
+        # pylint: disable-next=E1101
         perfil = Perfil.objects.filter(usuario=usuario).exists()
 
         if not perfil:
@@ -59,6 +80,7 @@ class SalvarPedido(View):
 
         vids = list(carrinho)
         bd_variacoes = list(
+            # pylint: disable-next=E1101
             Variacao.objects.select_related('produto').filter(id__in=vids)
         )
 
@@ -104,6 +126,7 @@ class SalvarPedido(View):
         )
         pedido.save()
 
+        # pylint: disable-next=E1101
         ItemPedido.objects.bulk_create(
             [
                 ItemPedido(
@@ -129,6 +152,10 @@ class SalvarPedido(View):
 
 
 class Detalhe(DispatchLoginRequiredMixin, DetailView):
+    '''
+    View que define como renderizar a página de detalhes de um pedido. Exige
+    que o usuário esteja conectado.
+    '''
     template_name = 'pedido/detalhe.html'
     model = Pedido
     pk_url_kwarg = 'pk'
@@ -136,7 +163,7 @@ class Detalhe(DispatchLoginRequiredMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         pedido = self.get_object()
-        if pedido.status in 'CRP':
+        if pedido.status in 'CRP':  # type: ignore
             return redirect(
                 reverse(
                     'pedido:pagar',
@@ -156,6 +183,10 @@ class Detalhe(DispatchLoginRequiredMixin, DetailView):
 
 
 class ListaPedido(DispatchLoginRequiredMixin, ListView):
+    '''
+    View que controla como a página de listagem de pedidos do usuário será
+    renderizada. Exige que o usuário esteja logado.
+    '''
     model = Pedido
     context_object_name = 'pedidos'
     template_name = 'pedido/lista.html'
@@ -164,6 +195,7 @@ class ListaPedido(DispatchLoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         ctx = super().get_context_data(**kwargs)
+        # pylint: disable-next=E1101
         usuario = Perfil.objects.filter(usuario=self.request.user).first()
         ctx.update({
             'usuario': usuario,

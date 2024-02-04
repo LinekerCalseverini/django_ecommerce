@@ -1,7 +1,10 @@
+'''
+Módulo que define as URLs do App Pedido.
+'''
 from django.urls import path
 from .views import Pagar, SalvarPedido, Detalhe, ListaPedido
 
-app_name = 'pedido'
+app_name = 'pedido'  # pylint: disable=C0103
 
 urlpatterns = [
     path('pagar/<int:pk>/', Pagar.as_view(), name='pagar'),
