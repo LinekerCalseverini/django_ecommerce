@@ -19,9 +19,7 @@
                     <tbody>
                         {% for pedido in pedidos %}
                             <tr>
-                                <th scope="row">
-                                    {{ pedido }}
-                                </td>
+                                <td scope="row">{{ pedido }}</td>
                                 <td>{{ pedido.total|formata_preco }}</td>
                                 <td>{{ pedido.qtd_total }}</td>
                                 <td>{{ pedido.get_status_display }}</td>
@@ -39,4 +37,3 @@
     </div>
     {% include "parciais/_pagination.html" %}
 {% endblock conteudo %}
-

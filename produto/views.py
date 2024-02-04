@@ -1,4 +1,6 @@
 from typing import Any
+from django.db.models.query import QuerySet
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views.generic.list import ListView
@@ -8,6 +10,7 @@ from django.contrib import messages
 from .models import Produto, Variacao
 from .utils import formata_carrinho
 from perfil.models import Perfil
+from django.db.models import Q
 
 # Create your views here.
 
@@ -16,7 +19,7 @@ class ListaProduto(ListView):
     model = Produto
     template_name = 'produto/lista.html'
     context_object_name = 'produtos'
-    paginate_by = 12
+    paginate_by = 1
     ordering = ['-id']
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
@@ -27,6 +30,36 @@ class ListaProduto(ListView):
         })
 
         return ctx
+
+
+class Busca(ListaProduto):
+    def get(self, request, *args, **kwargs):
+        termo = self.request.GET.get('termo', '').strip()
+        if not termo:
+            return redirect('produto:lista')
+
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        ctx = super().get_context_data(**kwargs)
+        termo = self.request.GET.get("termo", "")
+        ctx.update({
+            'page_title': f'{termo} - Busca - '
+        })
+        return ctx
+
+    def get_queryset(self) -> QuerySet[Any]:
+        qs = super().get_queryset()
+        termo = self.request.GET.get('termo', '').strip()
+
+        if not termo:
+            return qs
+
+        return qs.filter(
+            Q(nome__icontains=termo) |
+            Q(descricao_curta__icontains=termo) |
+            Q(descricao_longa__icontains=termo)
+        )
 
 
 class DetalheProduto(DetailView):
